@@ -91,3 +91,6 @@ venv.bak/
 
 # PyCharm
 .idea
+
+# Project
+usage/test*
