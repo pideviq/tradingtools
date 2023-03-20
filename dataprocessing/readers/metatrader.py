@@ -32,13 +32,13 @@ class MTReader:
                 "'filepath' must be an instance of 'pathlib.Path'")
 
         if is_intraday:
-            self._parse_dates = [ColumnsNames.DATE + ColumnsNames.TIME]
+            self._parse_dates = [[ColumnsNames.DATE, ColumnsNames.TIME]]
             self._columns_names = ColumnsNames.INTRADAY
             self._use_columns = ColumnsNames.USE_INTRADAY
             self._columns_types = ColumnsTypes.FOREX_INTRADAY if is_forex \
                 else ColumnsTypes.INTRADAY
         else:
-            self._parse_dates = ColumnsNames.DATE
+            self._parse_dates = [ColumnsNames.DATE]
             self._columns_names = ColumnsNames.GENERAL
             self._use_columns = ColumnsNames.USE_GENERAL
             self._columns_types = ColumnsTypes.FOREX if is_forex else \

@@ -1,6 +1,7 @@
 import unittest
 import pandas
 from pathlib import Path
+from typing import Final
 from dataprocessing.readers.metatrader import MTReader
 from dataprocessing.structures.metatrader import ColumnsNames, ColumnsTypes
 
@@ -8,8 +9,8 @@ from dataprocessing.structures.metatrader import ColumnsNames, ColumnsTypes
 class MTReaderTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
-        samples_folder: Path = Path.cwd().parent / 'samples'
-        self.files: dict = {
+        samples_folder: Final[Path] = Path.cwd().parent / 'samples'
+        self.files: dict[str: Path] = {
             'general': samples_folder / 'mt_general.csv',
             'intraday_forex': samples_folder / 'mt_intraday_forex.csv',
         }
@@ -20,20 +21,22 @@ class MTReaderTestCase(unittest.TestCase):
         self.assertEqual(ColumnsNames.COMMON,
                          general_data.columns.values.tolist())
         self.assertEqual(ColumnsTypes.GENERAL, general_data.dtypes.to_dict())
-        self.assertAlmostEqual(1807.84, general_data['Close'].iloc[-1], 2)
-        self.assertEqual(497481, general_data['Tickvol'].iloc[-1])
+        self.assertAlmostEqual(
+            1807.84, general_data[ColumnsNames.CLOSE].iloc[-1], 2)
+        self.assertEqual(497481, general_data[ColumnsNames.TICKVOL].iloc[-1])
 
     def test_read_csv_with_intraday_forex_data(self) -> None:
         forex_reader = MTReader(self.files['intraday_forex'],
                                 is_intraday=True,
                                 is_forex=True)
         forex_data = forex_reader.read_csv()
-        columns = ColumnsNames.COMMON + ColumnsNames.SPREAD
+        columns = ColumnsNames.COMMON + [ColumnsNames.SPREAD]
         self.assertEqual(columns, forex_data.columns.values.tolist())
         self.assertEqual(ColumnsTypes.FOREX_INTRADAY,
                          forex_data.dtypes[columns].to_dict())
-        self.assertAlmostEqual(1.21387, forex_data.iloc[0]['Close'], 5)
-        self.assertEqual(7, forex_data.iloc[0]['Spread'])
+        self.assertAlmostEqual(
+            1.21387, forex_data.iloc[0][ColumnsNames.CLOSE], 5)
+        self.assertEqual(7, forex_data.iloc[0][ColumnsNames.SPREAD])
 
     def test_empty_filename(self) -> None:
         with self.assertRaises(AttributeError):
